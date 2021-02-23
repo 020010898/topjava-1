@@ -5,13 +5,13 @@ import java.time.LocalDateTime;
 public class MealTo {
     protected Integer id;
 
-    private final LocalDateTime dateTime;
+    protected final LocalDateTime dateTime;
 
-    private final String description;
+    protected final String description;
 
-    private final int calories;
+    protected final int calories;
 
-    private final boolean excess;
+    protected final boolean excess;
 
     public MealTo(LocalDateTime dateTime, String description, int calories, boolean excess) {
         this(null, dateTime, description, calories, excess);
