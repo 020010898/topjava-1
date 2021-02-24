@@ -1,14 +1,13 @@
 package ru.javawebinar.topjava.web;
 
+
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.repository.InMemoryMealsRepository;
 import ru.javawebinar.topjava.repository.MealsRepository;
 import ru.javawebinar.topjava.util.MealsUtil;
 
-import static org.slf4j.LoggerFactory.getLogger;
-
-import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -16,16 +15,16 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.Map;
 import java.util.Objects;
 
 public class MealServlet extends HttpServlet {
-    private static final Logger LOG = getLogger(MealServlet.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MealServlet.class);
 
     private MealsRepository repository;
 
     @Override
-    public void init(ServletConfig config) throws ServletException {
-        super.init(config);
+    public void init() throws ServletException {
         repository = new InMemoryMealsRepository();
     }
 
@@ -63,16 +62,18 @@ public class MealServlet extends HttpServlet {
 //        }
         switch (action == null ? "all" : action) {
             case "delete":
-                int id = getId(request);
-                LOG.info("Delete {}", id);
-                repository.delete(id);
+                String i = request.getParameter("id");
+                System.out.println( "vivodim " + i);
+//                int id = getId(request);
+//                LOG.info("Delete {}", id);
+                repository.delete(Integer.valueOf(request.getParameter("id")));
                 response.sendRedirect("meals");
                 break;
             case "create":
             case "update":
                 final Meal meal = action.equals("create") ?
                         new Meal(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES), "", 1000) :
-                        repository.get(getId(request));
+                        repository.get(1);
                 request.setAttribute("meal", meal);
                 request.getRequestDispatcher("/mealEdit.jsp").forward(request, response);
                 break;
@@ -87,8 +88,7 @@ public class MealServlet extends HttpServlet {
     }
 
     private int getId(HttpServletRequest request) {
-        String paramId = Objects.requireNonNull(request.getParameter("id"));
-        System.out.println(paramId);
-        return Integer.parseInt(paramId);
+        String paramID = request.getParameter("id");
+        return Integer.parseInt(paramID);
     }
 }

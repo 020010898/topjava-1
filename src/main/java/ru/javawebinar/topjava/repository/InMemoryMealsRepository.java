@@ -11,8 +11,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class InMemoryMealsRepository implements MealsRepository {
-    private Map<Integer, Meal> repo = new ConcurrentHashMap<>();
-    private AtomicInteger counter = new AtomicInteger(0);
+    private final Map<Integer, Meal> repo = new ConcurrentHashMap<>();
+    private final AtomicInteger counter = new AtomicInteger(0);
 
     {
 //        save(new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 10, 0), "Завтрак", 500));
