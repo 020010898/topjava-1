@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class MealsUtil {
@@ -28,11 +29,11 @@ public class MealsUtil {
     );
 
     public static void main(String[] args) {
-        List<MealTo> mealsTo = filteredByStreams(MEAL_LIST, LocalTime.of(7, 0), LocalTime.of(12, 0), DEFAULT_CALORIES_PER_DAY);
+        List<MealTo> mealsTo = getTos(MEAL_LIST, DEFAULT_CALORIES_PER_DAY);
         mealsTo.forEach(System.out::println);
     }
 
-    public static List<MealTo> filteredByStreams(Collection<Meal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay) {
+    public static List<MealTo> filteredByPredicate(Collection<Meal> meals, int caloriesPerDay, Predicate<Meal> filter) {
         Map<LocalDate, Integer> caloriesSumByDate = meals.stream()
                 .collect(
                         Collectors.groupingBy(Meal::getDate, Collectors.summingInt(Meal::getCalories))
@@ -40,16 +41,16 @@ public class MealsUtil {
                 );
 
         return meals.stream()
-                .filter(meal -> TimeUtil.isBetweenHalfOpen(meal.getTime(), startTime, endTime))
+                .filter(filter)
                 .map(meal -> createTo(meal, caloriesSumByDate.get(meal.getDate()) > caloriesPerDay))
                 .collect(Collectors.toList());
     }
 
     private static MealTo createTo(Meal meal, boolean excess) {
-        return new MealTo(meal.getDateTime(), meal.getDescription(), meal.getCalories(), excess);
+        return new MealTo(meal.getId(), meal.getDateTime(), meal.getDescription(), meal.getCalories(), excess);
     }
 
-    public static List<MealTo> getWithExceeded(Collection<Meal> meals, int defaultCaloriesPerDay) {
-        return filteredByStreams(meals, LocalTime.MIN, LocalTime.MAX, defaultCaloriesPerDay);
+    public static List<MealTo> getTos(Collection<Meal> meals, int caloriesPerDay) {
+        return filteredByPredicate(meals, caloriesPerDay, meal -> true);
     }
 }

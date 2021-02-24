@@ -62,18 +62,17 @@ public class MealServlet extends HttpServlet {
 //        }
         switch (action == null ? "all" : action) {
             case "delete":
-                String i = request.getParameter("id");
-                System.out.println( "vivodim " + i);
-//                int id = getId(request);
+                int id = getId(request);
+                System.out.println( "vivodim " + id);
 //                LOG.info("Delete {}", id);
-                repository.delete(Integer.valueOf(request.getParameter("id")));
+                repository.delete(id);
                 response.sendRedirect("meals");
                 break;
             case "create":
             case "update":
                 final Meal meal = action.equals("create") ?
                         new Meal(LocalDateTime.now().truncatedTo(ChronoUnit.MINUTES), "", 1000) :
-                        repository.get(1);
+                        repository.get(getId(request));
                 request.setAttribute("meal", meal);
                 request.getRequestDispatcher("/mealEdit.jsp").forward(request, response);
                 break;
@@ -81,7 +80,7 @@ public class MealServlet extends HttpServlet {
             default:
                 LOG.info("getAll");
                 request.setAttribute( "meals",
-                        MealsUtil.getWithExceeded(repository.getAll(), MealsUtil.DEFAULT_CALORIES_PER_DAY));
+                        MealsUtil.getTos(repository.getAll(), MealsUtil.DEFAULT_CALORIES_PER_DAY));
                 request.getRequestDispatcher("meals.jsp").forward(request, response);
                 break;
         }
