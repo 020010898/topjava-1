@@ -22,16 +22,13 @@ public class InMemoryUserRepository implements UserRepository {
     @Override
     public boolean delete(int id) {
         log.info("delete {}", id);
-        if(repository.get(id)!= null){
-            repository.remove(id);
-        }
-        return true;
+        return repository.remove(id) != null;
     }
 
     @Override
     public User save(User user) {
         log.info("save {}", user);
-        if(user.isNew()){
+        if (user.isNew()) {
             user.setId(counter.incrementAndGet());
             repository.put(user.getId(), user);
             return user;
@@ -42,7 +39,7 @@ public class InMemoryUserRepository implements UserRepository {
     @Override
     public User get(int id) {
         log.info("get {}", id);
-        if(repository.get(id)!= null){
+        if (repository.get(id) != null) {
             return repository.get(id);
         }
         return null;
@@ -51,23 +48,18 @@ public class InMemoryUserRepository implements UserRepository {
     @Override
     public List<User> getAll() {
         log.info("getAll");
-        repository.put(1, new User(1, "Ivan", "ivan@mail.com", "123", Role.USER));
-        repository.put(2, new User(2, "Alex", "alex@mail.com", "222", Role.USER));
 
-        List<User> list =  repository.entrySet().stream().sorted(Comparator.comparing(e -> e.getValue().getName()))
-                .map(Map.Entry::getValue)
+        return repository.values().stream()
+                .sorted(Comparator.comparing(User::getName).thenComparing(User::getEmail))
                 .collect(Collectors.toList());
-        return list;
     }
 
     @Override
     public User getByEmail(String email) {
         log.info("getByEmail {}", email);
-        for(Map.Entry<Integer, User> map : repository.entrySet()){
-            if(map.getValue().getEmail().equals(email)){
-                return repository.get(map.getKey());
-            }
-        }
-        return null;
+        return repository.values().stream()
+                .filter(user -> email.equals(user.getEmail()))
+                .findFirst()
+                .orElse(null);
     }
 }
